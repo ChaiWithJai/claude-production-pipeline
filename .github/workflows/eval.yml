@@ -13,7 +13,10 @@ on:
 jobs:
   eval:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,12 +27,12 @@ jobs:
           python-version: '3.11'
       
       - name: Install dependencies
-        run: pip install anthropic
+        run: pip install -r requirements.txt
       
       - name: Run evals
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python eval_runner.py
+        run: python eval_runner.py --threshold 80
       
       - name: Comment on PR (if failed)
         if: failure() && github.event_name == 'pull_request'

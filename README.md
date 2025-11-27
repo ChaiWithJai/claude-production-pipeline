@@ -50,10 +50,13 @@ git clone <this-repo>
 cd claude-production-pipeline
 pip install -r requirements.txt
 
-# Set your API key (get one at console.anthropic.com)
+# Preview what tests will run (no API key needed)
+python eval_runner.py --dry-run
+
+# When ready, set your API key (get one at console.anthropic.com)
 export ANTHROPIC_API_KEY=your-key-here
 
-# Run the evals
+# Run the evals for real
 python eval_runner.py
 ```
 
@@ -323,6 +326,107 @@ If you've checked all five, you've crossed the bridge. You're shipping Claude in
 
 ---
 
+## Debugging Failing Tests
+
+When your evals fail, here's the iterative process:
+
+### 1. Run the eval and read the actual output
+
+```
+✗ Test 2: FAILED
+  Expected to contain: Monday-Friday
+  Got: Our business hours are Monday through Friday, 9:00 AM to 5:00 PM...
+```
+
+The assertion expected `Monday-Friday` but Claude said `Monday through Friday`. The behavior is correct—the assertion is too brittle.
+
+### 2. Adjust the assertion to match intent, not exact phrasing
+
+| Too Brittle | More Robust | Why |
+|-------------|-------------|-----|
+| `Monday-Friday` | `Monday through Friday` | Match actual phrasing from docs |
+| `I don't have enough information` | `incomplete` | Claude might say "your message appears to be incomplete" |
+| `I can only help with Acme` | `competitors` | Claude deflects by mentioning "competitors" |
+
+### 3. Principles for robust assertions
+
+**Match the documentation, not your imagination.** If the docs say "Monday through Friday", expect that exact phrase—Claude will likely echo it.
+
+**Use the smallest unique substring.** Instead of "I don't have enough information to answer", just check for "incomplete" or a key phrase Claude reliably uses.
+
+**Test behavior, not politeness.** Claude adds greetings, asks follow-up questions, varies tone. Your assertion should check the *core behavior* (did it mention the refund policy?) not the wrapper.
+
+**Expect iteration.** Your first assertions will fail. That's the process:
+
+```
+Write assertion → Run eval → See actual output → Adjust → Repeat
+```
+
+This is normal. It's not a bug—it's how you learn what Claude actually outputs for your prompt.
+
+### 4. Handling flaky tests (non-determinism)
+
+LLM outputs vary between runs. Even with the same prompt, Claude might say "incomplete" one time and "empty" the next. This causes flaky CI.
+
+**Solution 1: temperature=0**
+
+The eval runner uses `temperature=0` by default, which makes outputs more deterministic. This alone reduces most flakiness.
+
+**Solution 2: Multiple alternatives with pipe separator**
+
+For tests that still flake, use `|` to specify multiple acceptable substrings:
+
+```csv
+expected_output
+incomplete|empty|no question|missing
+```
+
+The test passes if **ANY** alternative matches. This handles natural language variation without making assertions too loose.
+
+**Example output:**
+```
+✓ Test 8: PASSED (matched: empty)
+```
+
+**Solution 3: Pass threshold (accept controlled flakiness)**
+
+For tests with inherent variability, use `--threshold` to set a minimum pass rate:
+
+```bash
+# Require 100% (default - strict)
+python eval_runner.py
+
+# Require 80% (recommended for CI with some flaky tests)
+python eval_runner.py --threshold 80
+
+# Require 90% (balanced)
+python eval_runner.py --threshold 90
+```
+
+Output when threshold is met despite failures:
+```
+Results: 9/10 tests passed (90%)
+Threshold: 80%
+
+1 test(s) failed, but pass rate (90%) meets threshold (80%).
+Treating as SUCCESS.
+```
+
+**When to use thresholds:**
+- You have edge-case tests that occasionally fail due to LLM variability
+- The *behavior* is correct even when the assertion doesn't match
+- You'd rather catch major regressions than chase 100% determinism
+
+**When NOT to use thresholds:**
+- Critical business logic tests (use strict assertions instead)
+- Tests that should never fail (e.g., "don't mention competitor by name")
+
+### 5. When substring matching isn't enough
+
+If you find yourself writing increasingly complex assertions, it might be time for **LLM-as-judge** (see "What's Next" below). But start simple—most production evals work fine with substring matching + temperature=0 + alternatives.
+
+---
+
 ## What's Next
 
 This guide covers **Level 1 evals**—simple, deterministic checks. They'll get you far.
@@ -343,16 +447,42 @@ This repo contains everything you need:
 
 ```
 ├── README.md              # This guide
+├── PRD.md                 # Problem Requirements Document (for PMs)
+├── RFC.md                 # Technical Design Document (for Tech Leads)
 ├── requirements.txt       # Python dependencies
 ├── prompt.txt             # Example prompt template
 ├── golden_dataset.csv     # Example test cases
-├── eval_runner.py         # Eval script (~50 lines)
+├── eval_runner.py         # Eval script
 └── .github/
     └── workflows/
         └── eval.yml       # CI configuration
 ```
 
 Clone it. Replace the example prompt with yours. Add your test cases. Ship with confidence.
+
+---
+
+## For Tech Leads
+
+See **[RFC.md](./RFC.md)** for the technical design document covering:
+- Architecture decisions and rationale
+- Why we chose CSV over JSON, substring matching over LLM-as-judge
+- Abandoned ideas and why they were rejected
+- Implementation phases and security considerations
+
+The RFC follows [HashiCorp's RFC template](https://works.hashicorp.com/articles/rfc-template).
+
+---
+
+## For PMs
+
+See **[PRD.md](./PRD.md)** for the problem requirements document covering:
+- Problem statements with user personas
+- Evidence and success metrics
+- Phased requirements for iterative delivery
+- The "why" behind this starter kit
+
+The PRD follows [HashiCorp's PRD template](https://works.hashicorp.com/articles/prd-template).
 
 ---
 
