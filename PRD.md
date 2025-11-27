@@ -3,11 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **Status** | Approved |
-| **Owner** | [Your Name] |
+| **Owner** | Jai Bhagat |
 | **Created** | November 2025 |
 | **Target Release** | v1.0 |
-| **Engineering Lead** | — |
-| **Design Lead** | — |
+| **Engineering Lead** | Katelyn Lesse |
+| **Design Lead** | Joel Lewenstein |
 
 ---
 
@@ -37,15 +37,7 @@ Developers encounter Claude through demos, workshops, or the Claude UI at claude
 
 ### Visual: The Gap
 
-```
-[Demo worked!] --???--> [Production with confidence]
-      ↑                           ↑
-  Claude UI                    Claude API
-                                   +
-                               Evals
-                                   +
-                                 CI
-```
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/4e8238cf-2cf5-4d32-bfd4-85cf370bdf97" />
 
 The "???" is what this kit solves.
 
