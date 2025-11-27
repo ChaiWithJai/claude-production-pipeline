@@ -39,6 +39,44 @@ You don't know where to start. You might not even know that the Claude Console e
 
 ---
 
+## Quick Start
+
+For those who want to try it now:
+
+```bash
+# Clone and setup
+git clone <this-repo>
+cd claude-production-pipeline
+pip install -r requirements.txt
+
+# Set your API key (get one at console.anthropic.com)
+export ANTHROPIC_API_KEY=your-key-here
+
+# Run the evals
+python eval_runner.py
+```
+
+Expected output:
+```
+Running evals...
+  Dataset: golden_dataset.csv
+  Prompt:  prompt.txt
+  Model:   claude-sonnet-4-20250514
+----------------------------------------
+✓ Test 1: PASSED
+✓ Test 2: PASSED
+✓ Test 3: PASSED
+...
+----------------------------------------
+Results: 10/10 tests passed (100%)
+
+All tests passed!
+```
+
+Now read on to understand *why* this matters.
+
+---
+
 ## The Landscape: Five Ways to Access Claude
 
 It's easy to get lost. Here's the map:
@@ -304,6 +342,7 @@ This repo contains everything you need:
 
 ```
 ├── README.md              # This guide
+├── requirements.txt       # Python dependencies
 ├── prompt.txt             # Example prompt template
 ├── golden_dataset.csv     # Example test cases
 ├── eval_runner.py         # Eval script (~50 lines)
