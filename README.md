@@ -49,10 +49,13 @@ git clone <this-repo>
 cd claude-production-pipeline
 pip install -r requirements.txt
 
-# Set your API key (get one at console.anthropic.com)
+# Preview what tests will run (no API key needed)
+python eval_runner.py --dry-run
+
+# When ready, set your API key (get one at console.anthropic.com)
 export ANTHROPIC_API_KEY=your-key-here
 
-# Run the evals
+# Run the evals for real
 python eval_runner.py
 ```
 
@@ -342,16 +345,42 @@ This repo contains everything you need:
 
 ```
 ├── README.md              # This guide
+├── PRD.md                 # Problem Requirements Document (for PMs)
+├── RFC.md                 # Technical Design Document (for Tech Leads)
 ├── requirements.txt       # Python dependencies
 ├── prompt.txt             # Example prompt template
 ├── golden_dataset.csv     # Example test cases
-├── eval_runner.py         # Eval script (~50 lines)
+├── eval_runner.py         # Eval script
 └── .github/
     └── workflows/
         └── eval.yml       # CI configuration
 ```
 
 Clone it. Replace the example prompt with yours. Add your test cases. Ship with confidence.
+
+---
+
+## For Tech Leads
+
+See **[RFC.md](./RFC.md)** for the technical design document covering:
+- Architecture decisions and rationale
+- Why we chose CSV over JSON, substring matching over LLM-as-judge
+- Abandoned ideas and why they were rejected
+- Implementation phases and security considerations
+
+The RFC follows [HashiCorp's RFC template](https://works.hashicorp.com/articles/rfc-template).
+
+---
+
+## For PMs
+
+See **[PRD.md](./PRD.md)** for the problem requirements document covering:
+- Problem statements with user personas
+- Evidence and success metrics
+- Phased requirements for iterative delivery
+- The "why" behind this starter kit
+
+The PRD follows [HashiCorp's PRD template](https://works.hashicorp.com/articles/prd-template).
 
 ---
 
