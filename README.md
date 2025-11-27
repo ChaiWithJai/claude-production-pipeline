@@ -387,13 +387,38 @@ The test passes if **ANY** alternative matches. This handles natural language va
 ✓ Test 8: PASSED (matched: empty)
 ```
 
-**Solution 3: When to accept some flakiness**
+**Solution 3: Pass threshold (accept controlled flakiness)**
 
-If a test fails occasionally but passes most of the time, ask yourself:
-- Is the *behavior* correct even when the assertion fails?
-- Am I testing the right thing?
+For tests with inherent variability, use `--threshold` to set a minimum pass rate:
 
-Sometimes the answer is to relax the assertion. Other times it's to rethink what you're actually testing.
+```bash
+# Require 100% (default - strict)
+python eval_runner.py
+
+# Require 80% (recommended for CI with some flaky tests)
+python eval_runner.py --threshold 80
+
+# Require 90% (balanced)
+python eval_runner.py --threshold 90
+```
+
+Output when threshold is met despite failures:
+```
+Results: 9/10 tests passed (90%)
+Threshold: 80%
+
+1 test(s) failed, but pass rate (90%) meets threshold (80%).
+Treating as SUCCESS.
+```
+
+**When to use thresholds:**
+- You have edge-case tests that occasionally fail due to LLM variability
+- The *behavior* is correct even when the assertion doesn't match
+- You'd rather catch major regressions than chase 100% determinism
+
+**When NOT to use thresholds:**
+- Critical business logic tests (use strict assertions instead)
+- Tests that should never fail (e.g., "don't mention competitor by name")
 
 ### 5. When substring matching isn't enough
 

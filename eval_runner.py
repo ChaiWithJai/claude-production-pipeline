@@ -177,6 +177,8 @@ def main():
     parser.add_argument("--prompt", default="prompt.txt", help="Path to prompt template")
     parser.add_argument("--model", default="claude-sonnet-4-20250514", help="Model to use")
     parser.add_argument("--dry-run", action="store_true", help="Preview tests without calling the API")
+    parser.add_argument("--threshold", type=int, default=100,
+                        help="Minimum pass rate %% to succeed (default: 100). Use 80-90 for flaky tests.")
     args = parser.parse_args()
 
     # Validate files exist
@@ -217,22 +219,29 @@ def main():
         sys.exit(1)
 
     print(f"Running evals...")
-    print(f"  Dataset: {args.dataset}")
-    print(f"  Prompt:  {args.prompt}")
-    print(f"  Model:   {args.model}")
+    print(f"  Dataset:   {args.dataset}")
+    print(f"  Prompt:    {args.prompt}")
+    print(f"  Model:     {args.model}")
+    print(f"  Threshold: {args.threshold}%")
     print("-" * 40)
 
     passed, total, failures = run_evals(args.dataset, args.prompt, args.model)
 
     print("-" * 40)
-    print(f"Results: {passed}/{total} tests passed ({100*passed//total}%)")
+    pass_rate = 100 * passed // total if total > 0 else 0
+    print(f"Results: {passed}/{total} tests passed ({pass_rate}%)")
+    print(f"Threshold: {args.threshold}%")
 
-    if failures:
-        print(f"\n{len(failures)} test(s) failed.")
-        sys.exit(1)
-    else:
-        print("\nAll tests passed!")
+    if pass_rate >= args.threshold:
+        if failures:
+            print(f"\n{len(failures)} test(s) failed, but pass rate ({pass_rate}%) meets threshold ({args.threshold}%).")
+            print("Treating as SUCCESS.")
+        else:
+            print("\nAll tests passed!")
         sys.exit(0)
+    else:
+        print(f"\nFAILED: Pass rate ({pass_rate}%) is below threshold ({args.threshold}%).")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
