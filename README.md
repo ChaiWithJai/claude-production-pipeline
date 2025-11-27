@@ -1,4 +1,5 @@
-# From Demo to Production: A Guide to Shipping Claude in Your Organization
+# From Demo to Production:
+##A Guide to Shipping Claude in Your Organization
 
 > For the developer who saw Claude do something impressive and is now asking: "How do I make this real for my team?"
 
