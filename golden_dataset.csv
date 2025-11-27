@@ -1,0 +1,11 @@
+COMPANY_NAME,CUSTOMER_QUESTION,DOCUMENTATION,expected_output
+Acme Inc,How do I reset my password?,"Password Reset Instructions: Visit acme.com/reset and enter your email address. You'll receive a reset link within 5 minutes. Links expire after 24 hours.",acme.com/reset
+Acme Inc,What are your business hours?,"Hours of Operation: Monday through Friday, 9:00 AM to 5:00 PM Eastern Time. We are closed on weekends and major US holidays.",Monday-Friday
+Acme Inc,Can I get a refund?,"Refund Policy: Full refunds are available within 30 days of purchase for unused products. Contact support@acme.com with your order number to initiate a refund.",30 days
+Acme Inc,What payment methods do you accept?,"Payment Options: We accept Visa, Mastercard, American Express, and PayPal. All transactions are processed securely through Stripe.",Visa
+Acme Inc,How do I contact support?,"Contact Us: Email support@acme.com or call 1-800-ACME-HELP during business hours. Average response time is under 4 hours.",support@acme.com
+Acme Inc,What's the status of my order?,"Order Tracking: Log into your account at acme.com/orders to view real-time order status and tracking information.",acme.com/orders
+Acme Inc,Do you ship internationally?,"Shipping: We currently ship to the United States and Canada. International shipping to other countries is not available at this time.",United States and Canada
+Acme Inc,,"No documentation available for this query.",don't have enough information
+Acme Inc,Tell me about your competitor's pricing,"Product Catalog: Acme widgets start at $29.99. Premium widgets are $49.99. Enterprise pricing available on request.",can only help with Acme
+Acme Inc,My widget arrived broken. What do I do?,"Damaged Items: If your product arrived damaged, email support@acme.com with photos within 7 days of delivery. We'll send a replacement at no charge.",photos
