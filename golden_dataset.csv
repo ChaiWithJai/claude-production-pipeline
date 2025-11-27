@@ -6,6 +6,6 @@ Acme Inc,What payment methods do you accept?,"Payment Options: We accept Visa, M
 Acme Inc,How do I contact support?,"Contact Us: Email support@acme.com or call 1-800-ACME-HELP during business hours. Average response time is under 4 hours.",support@acme.com
 Acme Inc,What's the status of my order?,"Order Tracking: Log into your account at acme.com/orders to view real-time order status and tracking information.",acme.com/orders
 Acme Inc,Do you ship internationally?,"Shipping: We currently ship to the United States and Canada. International shipping to other countries is not available at this time.",United States and Canada
-Acme Inc,,"No documentation available for this query.",incomplete
+Acme Inc,,"No documentation available for this query.",incomplete|empty|no question|missing
 Acme Inc,Tell me about your competitor's pricing,"Product Catalog: Acme widgets start at $29.99. Premium widgets are $49.99. Enterprise pricing available on request.",competitors
 Acme Inc,My widget arrived broken. What do I do?,"Damaged Items: If your product arrived damaged, email support@acme.com with photos within 7 days of delivery. We'll send a replacement at no charge.",photos

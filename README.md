@@ -363,9 +363,41 @@ Write assertion → Run eval → See actual output → Adjust → Repeat
 
 This is normal. It's not a bug—it's how you learn what Claude actually outputs for your prompt.
 
-### 4. When substring matching isn't enough
+### 4. Handling flaky tests (non-determinism)
 
-If you find yourself writing increasingly complex assertions, it might be time for **LLM-as-judge** (see "What's Next" below). But start simple—most production evals work fine with substring matching.
+LLM outputs vary between runs. Even with the same prompt, Claude might say "incomplete" one time and "empty" the next. This causes flaky CI.
+
+**Solution 1: temperature=0**
+
+The eval runner uses `temperature=0` by default, which makes outputs more deterministic. This alone reduces most flakiness.
+
+**Solution 2: Multiple alternatives with pipe separator**
+
+For tests that still flake, use `|` to specify multiple acceptable substrings:
+
+```csv
+expected_output
+incomplete|empty|no question|missing
+```
+
+The test passes if **ANY** alternative matches. This handles natural language variation without making assertions too loose.
+
+**Example output:**
+```
+✓ Test 8: PASSED (matched: empty)
+```
+
+**Solution 3: When to accept some flakiness**
+
+If a test fails occasionally but passes most of the time, ask yourself:
+- Is the *behavior* correct even when the assertion fails?
+- Am I testing the right thing?
+
+Sometimes the answer is to relax the assertion. Other times it's to rethink what you're actually testing.
+
+### 5. When substring matching isn't enough
+
+If you find yourself writing increasingly complex assertions, it might be time for **LLM-as-judge** (see "What's Next" below). But start simple—most production evals work fine with substring matching + temperature=0 + alternatives.
 
 ---
 

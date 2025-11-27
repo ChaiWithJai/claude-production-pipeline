@@ -44,16 +44,28 @@ def fill_template(template: str, variables: dict) -> str:
     return result
 
 
-def check_output(actual: str, expected: str) -> bool:
+def check_output(actual: str, expected: str) -> tuple[bool, str]:
     """
     Check if the actual output meets expectations.
-    
-    This is a simple substring check. For more sophisticated evals,
-    consider LLM-as-judge (see README for resources).
+
+    Supports multiple alternatives with pipe separator: "option1|option2|option3"
+    Passes if ANY alternative matches (OR logic).
+
+    Returns: (passed, matched_term or None)
     """
     if not expected:
-        return True  # No expectation = always pass
-    return expected.lower() in actual.lower()
+        return True, None  # No expectation = always pass
+
+    actual_lower = actual.lower()
+
+    # Support multiple alternatives with | separator
+    alternatives = [alt.strip() for alt in expected.split("|")]
+
+    for alt in alternatives:
+        if alt.lower() in actual_lower:
+            return True, alt
+
+    return False, None
 
 
 def dry_run_evals(dataset_path: str, prompt_path: str) -> int:
@@ -119,11 +131,12 @@ def run_evals(dataset_path: str, prompt_path: str, model: str = "claude-sonnet-4
             # Fill the template
             prompt = fill_template(template, variables)
             
-            # Call the API
+            # Call the API with temperature=0 for deterministic outputs
             try:
                 response = client.messages.create(
                     model=model,
                     max_tokens=1024,
+                    temperature=0,  # Deterministic outputs for consistent evals
                     messages=[{"role": "user", "content": prompt}]
                 )
                 actual = response.content[0].text
@@ -135,11 +148,15 @@ def run_evals(dataset_path: str, prompt_path: str, model: str = "claude-sonnet-4
                     "variables": variables
                 })
                 continue
-            
+
             # Check the result
-            if check_output(actual, expected):
+            is_pass, matched = check_output(actual, expected)
+            if is_pass:
                 passed += 1
-                print(f"✓ {test_name}: PASSED")
+                if matched:
+                    print(f"✓ {test_name}: PASSED (matched: {matched})")
+                else:
+                    print(f"✓ {test_name}: PASSED")
             else:
                 print(f"✗ {test_name}: FAILED")
                 print(f"  Expected to contain: {expected}")
