@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Status** | Approved |
-| **Owner** | [Your Name] |
+| **Owner** | Jai Bhagat |
 | **Created** | November 2025 |
 | **Target Version** | v1.0 |
 | **PRD Link** | [PRD.md](./PRD.md) |
