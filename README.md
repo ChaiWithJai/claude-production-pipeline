@@ -325,6 +325,50 @@ If you've checked all five, you've crossed the bridge. You're shipping Claude in
 
 ---
 
+## Debugging Failing Tests
+
+When your evals fail, here's the iterative process:
+
+### 1. Run the eval and read the actual output
+
+```
+✗ Test 2: FAILED
+  Expected to contain: Monday-Friday
+  Got: Our business hours are Monday through Friday, 9:00 AM to 5:00 PM...
+```
+
+The assertion expected `Monday-Friday` but Claude said `Monday through Friday`. The behavior is correct—the assertion is too brittle.
+
+### 2. Adjust the assertion to match intent, not exact phrasing
+
+| Too Brittle | More Robust | Why |
+|-------------|-------------|-----|
+| `Monday-Friday` | `Monday through Friday` | Match actual phrasing from docs |
+| `I don't have enough information` | `incomplete` | Claude might say "your message appears to be incomplete" |
+| `I can only help with Acme` | `competitors` | Claude deflects by mentioning "competitors" |
+
+### 3. Principles for robust assertions
+
+**Match the documentation, not your imagination.** If the docs say "Monday through Friday", expect that exact phrase—Claude will likely echo it.
+
+**Use the smallest unique substring.** Instead of "I don't have enough information to answer", just check for "incomplete" or a key phrase Claude reliably uses.
+
+**Test behavior, not politeness.** Claude adds greetings, asks follow-up questions, varies tone. Your assertion should check the *core behavior* (did it mention the refund policy?) not the wrapper.
+
+**Expect iteration.** Your first assertions will fail. That's the process:
+
+```
+Write assertion → Run eval → See actual output → Adjust → Repeat
+```
+
+This is normal. It's not a bug—it's how you learn what Claude actually outputs for your prompt.
+
+### 4. When substring matching isn't enough
+
+If you find yourself writing increasingly complex assertions, it might be time for **LLM-as-judge** (see "What's Next" below). But start simple—most production evals work fine with substring matching.
+
+---
+
 ## What's Next
 
 This guide covers **Level 1 evals**—simple, deterministic checks. They'll get you far.
